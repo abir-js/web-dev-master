@@ -106,3 +106,39 @@ export const TaskStatusEnum = {
 
 export const AvailableTaskStatuses = Object.values(TaskStatusEnum);
 ```
+
+## 9. Add Mongodb Connection
+
+```js
+// db/index.js
+import mongoose from "mongoose";
+
+const connctDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
+    console.log("✅ Mongodb connected");
+  } catch (error) {
+    console.error(" ❌ Mongodb Connection error", error);
+    process.exit(1);
+  }
+};
+
+export default connctDB;
+```
+
+```js
+// index.js
+connectDB()
+  .then(() => {
+    app.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`);
+    });
+  })
+  .catch((err) => {
+    console.error("❌ Mongodb Connection error", err);
+    process.exit(1);
+  })
+```
+
+## 10. Add Healthcheck route
+
