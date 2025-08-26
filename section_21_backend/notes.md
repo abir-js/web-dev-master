@@ -257,3 +257,12 @@ export const User = mongoose.model("User", userSchema);
 ```
 
 ## 12. Hash Passwords with Pre Hooks
+
+```js
+userSchema.pre("save", async function (next) {
+  if (!this.isModified("password")) return next();
+  this.password = await bcrypt.hash(this.password, 10);
+  next();
+});
+```
+
