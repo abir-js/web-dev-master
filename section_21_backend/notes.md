@@ -142,3 +142,118 @@ connectDB()
 
 ## 10. Add Healthcheck route
 
+**Using extra asychHandler function**
+
+`utils/asyncHandler.js`
+
+```js
+const asyncHandler = (requestHandler) => {
+  return (req, res, next) => {
+    Promise
+    .resolve(requestHandler(req, res, next))
+    .catch((err) => next(err));
+  };
+};
+
+export { asyncHandler };
+
+```
+
+`controllers/healthcheck.controller.js`
+```js
+import { ApiResponse } from "../utils/api-response.js";
+import { asyncHandler } from "../utils/async-handler.js";
+
+// const healthCheck = async (req, res, next) => {
+//   try {
+//     const user = await getUserFromDB();
+//     res
+//       .status(200)
+//       .json(new ApiResponse(200, { message: "Server is up and running" }));
+//   } catch (error) {
+//     next(error);
+// 1. There is a chance that the `catch` part will never run, so we need to use `next()`
+// 2. use less `try-catch` blocks
+//   }
+// };
+
+const healthCheck = asyncHandler(async (req, res) => {
+  res
+    .status(200)
+    .json(new ApiResponse(200, { message: "Server is up and running" }));
+});
+
+export { healthCheck };
+
+```
+
+## 11. Create a model for user
+
+`models/user.model.js`
+
+```js
+import mongoose from "mongoose";
+
+const userSchema = new mongoose.Schema(
+  {
+    avatar: {
+      type: {
+        url: String,
+        localPath: String,
+      },
+      default: {
+        url: `https://placehold.co/200x200`,
+        localPath: "",
+      },
+    },
+    userName: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+      index: true,
+    },
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+    fullName: {
+      type: String,
+      trim: true,
+    },
+    password: {
+      type: String,
+      required: [true, "Password is required"],
+    },
+    isEmailVerified: {
+      type: Boolean,
+      default: false,
+    },
+    refreshToken: {
+      type: String,
+    },
+    forgotPasswordToken: {
+      type: String,
+    },
+    forgotPasswordExpiry: {
+      type: Date,
+    },
+    emailverificationToken: {
+      type: String,
+    },
+    emailverificationExpiry: {
+      type: Date,
+    },
+  },
+  { timestamps: true },
+);
+
+export const User = mongoose.model("User", userSchema);
+
+```
+
+## 12. Hash Passwords with Pre Hooks
