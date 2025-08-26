@@ -1,16 +1,20 @@
 ## 1. Initial Steps
+
 1. Create a PRD
 2. Add prettier
 3. Add .gitignore
 4. Add dotenv, .env
 
 ## 2. Dotenv
+
 1. **dotenv.config()**
+
 ```
 dotenv.config({
     path: "path to .env"
 })
 ```
+
 ## 3. folder structure
 
 - public
@@ -27,10 +31,12 @@ dotenv.config({
   - index.js
 
 ## 4. Add routing library and database
+
 1. Express
 2. Mongoose
 
 ## 5. Add middlewares
+
 1. `express.json({limit: "16kb})`
 2. `express.urlencoded({ extended: true, limit: "16kb" })`
 
@@ -43,7 +49,7 @@ app.use(
     credentials: true,
     methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
-  }),
+  })
 );
 ```
 
@@ -69,11 +75,11 @@ class ApiError extends Error {
     statusCode,
     message = "Something went wrong",
     errors = [],
-    stack = "",
+    stack = ""
   ) {
     super(message);
     this.statusCode = statusCode;
-    ((this.data = null), (this.message = message));
+    (this.data = null), (this.message = message);
     this.success = false;
     this.errors = errors;
     if (stack) {
@@ -137,7 +143,7 @@ connectDB()
   .catch((err) => {
     console.error("❌ Mongodb Connection error", err);
     process.exit(1);
-  })
+  });
 ```
 
 ## 10. Add Healthcheck route
@@ -149,17 +155,15 @@ connectDB()
 ```js
 const asyncHandler = (requestHandler) => {
   return (req, res, next) => {
-    Promise
-    .resolve(requestHandler(req, res, next))
-    .catch((err) => next(err));
+    Promise.resolve(requestHandler(req, res, next)).catch((err) => next(err));
   };
 };
 
 export { asyncHandler };
-
 ```
 
 `controllers/healthcheck.controller.js`
+
 ```js
 import { ApiResponse } from "../utils/api-response.js";
 import { asyncHandler } from "../utils/async-handler.js";
@@ -184,7 +188,6 @@ const healthCheck = asyncHandler(async (req, res) => {
 });
 
 export { healthCheck };
-
 ```
 
 ## 11. Create a model for user
@@ -249,11 +252,10 @@ const userSchema = new mongoose.Schema(
       type: Date,
     },
   },
-  { timestamps: true },
+  { timestamps: true }
 );
 
 export const User = mongoose.model("User", userSchema);
-
 ```
 
 ## 12. Hash Passwords with Pre Hooks
@@ -266,3 +268,10 @@ userSchema.pre("save", async function (next) {
 });
 ```
 
+## 13. Adding method in userschema to check encrypted password
+
+```js
+userSchema.methods.isPasswordCorrect = async function (password) {
+  return await bcrypt.compare(this.password, password);
+};
+```
