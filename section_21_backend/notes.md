@@ -410,3 +410,11 @@ const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
 
 export { emailVerificationMailgenContent, forgotPasswordMailgenContent };
 ```
+
+## 18. How to send email
+
+1. Production Email
+   1. AWS SES
+   2. Brevo
+2. Development Email
+   1. Mailtrap 
