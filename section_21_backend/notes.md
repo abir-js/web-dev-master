@@ -282,3 +282,78 @@ userSchema.methods.isPasswordCorrect = async function (password) {
 
 [Introduction to JWT](https://www.jwt.io/introduction#what-is-json-web-token-structure)
 
+## 15. Access Token and Refresh Token
+
+### Token
+
+Random Strings like - ajscbdhl
+
+1. **without data**
+   1. Server generates a token
+   2. Generates Copy Token, sends one to client and keeps another
+   3. If a client sends request with same token then client is verified
+2. **with data**
+   1. Server creates `Access Token` and `Refresh Token`.
+   2. Sends both to client and saves only `Refresh Token` in database.
+   3. Client Sends `Access Token` with each request and accesses server.
+   4. `Access Token` has expiery time like 1 Day and `Refresh Token` has 10 day.
+   5. After that period when user send `Expired access token`, server sends `401` status code.
+   6. Client sends `Refresh Token`, server matches with database.
+      1. If matched, server sends new `Access Token`
+
+## 16. Code for Access Token, Refresh Token and Temporary Token
+
+**Access Token**
+
+`models/user.model.js`
+
+```js
+userSchema.methods.generateAccessToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      userName: this.userName,
+    },
+    process.env.ACCESS_TOKEN_SECRET,
+    { expiresIn: ACCESS_TOKEN_EXPIRY },
+  );
+};
+```
+
+**Refresh Token**
+
+`models/user.model.js`
+
+```js
+
+userSchema.methods.generateRefreshToken = function () {
+  return jwt.sign(
+    {
+      _id: this._id,
+      email: this.email,
+      userName: this.userName,
+    },
+    process.env.REFRESH_TOKEN_SECRET,
+    { expiresIn: REFRESH_TOKEN_EXPIRY },
+  );
+};
+```
+
+**Temporary Token**
+
+`models/user.model.js`
+
+```js
+userSchema.methods.generateTemporaryToken = function () {
+  const unHashedToken = crypto.randomBytes(32).toString("hex");
+
+  const hashedToken = crypto
+    .createHash("sha256")
+    .update(unHashedToken)
+    .digest("hex");
+
+  const tokenExpiry = Date.now() + 1000 * 60 * 20;
+  return { unHashedToken, hashedToken, tokenExpiry };
+};
+```
