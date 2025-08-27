@@ -316,7 +316,7 @@ userSchema.methods.generateAccessToken = function () {
       userName: this.userName,
     },
     process.env.ACCESS_TOKEN_SECRET,
-    { expiresIn: ACCESS_TOKEN_EXPIRY },
+    { expiresIn: ACCESS_TOKEN_EXPIRY }
   );
 };
 ```
@@ -326,7 +326,6 @@ userSchema.methods.generateAccessToken = function () {
 `models/user.model.js`
 
 ```js
-
 userSchema.methods.generateRefreshToken = function () {
   return jwt.sign(
     {
@@ -335,7 +334,7 @@ userSchema.methods.generateRefreshToken = function () {
       userName: this.userName,
     },
     process.env.REFRESH_TOKEN_SECRET,
-    { expiresIn: REFRESH_TOKEN_EXPIRY },
+    { expiresIn: REFRESH_TOKEN_EXPIRY }
   );
 };
 ```
@@ -356,4 +355,58 @@ userSchema.methods.generateTemporaryToken = function () {
   const tokenExpiry = Date.now() + 1000 * 60 * 20;
   return { unHashedToken, hashedToken, tokenExpiry };
 };
+```
+
+---
+
+## 17. Add email templates
+
+1. [Mailgen](https://mailgen.js.org/)
+2. [Nodemailer](https://nodemailer.com/about/)
+
+`utils/email-templates.js`
+
+```js
+import mailgen from "mailgen";
+
+const emailVerificationMailgenContent = (username, verificationUrl) => {
+  return {
+    body: {
+      name: username,
+      intro:
+        "Welcome to project management app! We're very excited to have you on board.",
+      action: {
+        instructions: "To verify your email, please click here:",
+        button: {
+          color: "#22BC66",
+          text: "verify your email",
+          link: verificationUrl,
+        },
+      },
+      outro:
+        "Need help, or have questions? Just reply to this email, we'd love to help.",
+    },
+  };
+};
+
+const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
+  return {
+    body: {
+      name: username,
+      intro: "You have requested to reset your password.",
+      action: {
+        instructions: "To reset your password, please click here:",
+        button: {
+          color: "#22BC66",
+          text: "Reset your password",
+          link: passwordResetUrl,
+        },
+      },
+      outro:
+        "Need help, or have questions? Just reply to this email, we'd love to help.",
+    },
+  };
+};
+
+export { emailVerificationMailgenContent, forgotPasswordMailgenContent };
 ```
