@@ -13,7 +13,7 @@ const sendEmail = async (options) => {
   const emailTextual = mailGenerator.generatePlaintext(options.mailgenContent);
   const emailHTML = mailGenerator.generate(options.mailgenContent);
 
-  const transport = nodemailer.createTransport({
+  const transporter = nodemailer.createTransport({
     host: process.env.MAILTRAP_SMTP_HOST,
     port: process.env.MAILTRAP_SMTP_PORT,
     auth: {
@@ -21,6 +21,21 @@ const sendEmail = async (options) => {
       pass: process.env.MAILTRAP_SMTP_PASS,
     },
   });
+
+  const mail = {
+    from: "mail.taskmanager@example.com",
+    to: options.email,
+    subject: options.subject,
+    text: emailTextual,
+    html: emailHTML,
+  }
+
+  try {
+    await transporter.sendEmail(mail)
+  } catch (error) {
+    console.error("❌ Error sending email", error);
+  }
+
 };
 
 const emailVerificationMailgenContent = (username, verificationUrl) => {
@@ -62,4 +77,4 @@ const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
   };
 };
 
-export { emailVerificationMailgenContent, forgotPasswordMailgenContent };
+export { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmail };
