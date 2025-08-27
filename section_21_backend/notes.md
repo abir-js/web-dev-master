@@ -275,3 +275,10 @@ userSchema.methods.isPasswordCorrect = async function (password) {
   return await bcrypt.compare(this.password, password);
 };
 ```
+
+## 14. JWT token
+
+![jwt](jwt.png)
+
+[Introduction to JWT](https://www.jwt.io/introduction#what-is-json-web-token-structure)
+
