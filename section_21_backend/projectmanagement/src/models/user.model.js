@@ -15,7 +15,7 @@ const userSchema = new mongoose.Schema(
         localPath: "",
       },
     },
-    userName: {
+    username: {
       type: String,
       required: true,
       unique: true,

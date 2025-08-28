@@ -501,3 +501,8 @@ const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
 
 export { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmail };
 ```
+
+---
+
+## 19. Register User
+
