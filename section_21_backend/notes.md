@@ -417,7 +417,7 @@ export { emailVerificationMailgenContent, forgotPasswordMailgenContent };
    1. AWS SES
    2. Brevo
 2. Development Email
-   1. Mailtrap 
+   1. Mailtrap
 
 ```js
 import Mailgen from "mailgen";
@@ -450,14 +450,13 @@ const sendEmail = async (options) => {
     subject: options.subject,
     text: emailTextual,
     html: emailHTML,
-  }
+  };
 
   try {
-    await transporter.sendMail(mail)
+    await transporter.sendMail(mail);
   } catch (error) {
     console.error("❌ Error sending email", error);
   }
-
 };
 
 const emailVerificationMailgenContent = (username, verificationUrl) => {
@@ -499,7 +498,11 @@ const forgotPasswordMailgenContent = (username, passwordResetUrl) => {
   };
 };
 
-export { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmail };
+export {
+  emailVerificationMailgenContent,
+  forgotPasswordMailgenContent,
+  sendEmail,
+};
 ```
 
 ---
@@ -538,13 +541,15 @@ const registerUser = asyncHandler(async (req, res) => {
     subject: "Email Verification",
     mailgenContent: emailVerificationMailgenContent(
       user.username,
-      `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`,
+      `${req.protocol}://${req.get(
+        "host"
+      )}/api/v1/users/verify-email/${unHashedToken}`
     ),
   });
 
   // ✅ Fetch user without sensitive fields
   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
   );
 
   if (!createdUser) {
@@ -555,7 +560,7 @@ const registerUser = asyncHandler(async (req, res) => {
     new ApiResponse(201, {
       message: "User registered successfully and verification email sent",
       data: createdUser,
-    }),
+    })
   );
 });
 ```
@@ -587,3 +592,70 @@ It is used to modify the request and response objects before they reach the rout
 ```sh
 npm i express-validator
 ```
+
+`validators/user.validator.js`
+
+```js
+import { body } from "express-validator";
+
+const userRegisterValidator = [
+  body("email")
+    .trim()
+    .notEmpty()
+    .withMessage("Email is empty")
+    .isEmail()
+    .withMessage("Email is invalid"),
+  body("username")
+    .trim()
+    .notEmpty()
+    .withMessage("Username is required")
+    .isLowercase()
+    .withMessage("Username must be lowercase")
+    .isLength({ min: 3 })
+    .withMessage("Username must be at least 3 characters long"),
+  body("password")
+    .trim()
+    .notEmpty()
+    .withMessage("Password is required")
+    .isLength({ min: 6 })
+    .withMessage("Password must be at least 6 characters long"),
+  body("fullName")
+    .trim()
+    .notEmpty()
+    .withMessage("Full name is required")
+    .isLength({ min: 3 })
+    .withMessage("Full name must be at least 3 characters long"),
+];
+
+export { userRegisterValidator };
+```
+
+`middlewares/validation.middleware.js`
+
+```js
+import { validationResult } from "express-validator";
+import { ApiError } from "../utils/api-error.js";
+
+export const validate = (req, res, next) => {
+  const errors = validationResult(req);
+  if (errors.isEmpty()) {
+    return next();
+  }
+  const extractedErrors = [];
+  errors.array().map((err) =>
+    extractedErrors.push({
+      [err.path]: err.msg,
+    })
+  );
+  throw new ApiError(422, "Retrived data is not valid", extractedErrors);
+};
+```
+
+`routes/user.route.js`
+
+```js
+router.route("/register").post(userRegisterValidator(), validate, registerUser);
+```
+---
+
+## 21
