@@ -453,7 +453,7 @@ const sendEmail = async (options) => {
   }
 
   try {
-    await transporter.sendEmail(mail)
+    await transporter.sendMail(mail)
   } catch (error) {
     console.error("❌ Error sending email", error);
   }
@@ -506,3 +506,84 @@ export { emailVerificationMailgenContent, forgotPasswordMailgenContent, sendEmai
 
 ## 19. Register User
 
+```js
+const registerUser = asyncHandler(async (req, res) => {
+  const { email, username, password, role } = req.body;
+
+  const existingUser = await User.findOne({
+    $or: [{ username }, { email }],
+  });
+
+  if (existingUser) {
+    throw new ApiError(409, "Username or email already exists", []);
+  }
+
+  const user = await User.create({
+    email,
+    password,
+    username,
+    role, // ✅ include role
+    isEmailVerified: false,
+  });
+
+  const { unHashedToken, hashedToken, tokenExpiry } =
+    user.generateTemporaryToken();
+
+  user.emailVerificationToken = hashedToken;
+  user.emailVerificationExpiry = tokenExpiry;
+  await user.save({ validateBeforeSave: false });
+
+  await sendEmail({
+    email: user?.email,
+    subject: "Email Verification",
+    mailgenContent: emailVerificationMailgenContent(
+      user.username,
+      `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`,
+    ),
+  });
+
+  // ✅ Fetch user without sensitive fields
+  const createdUser = await User.findById(user._id).select(
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
+  );
+
+  if (!createdUser) {
+    throw new ApiError(500, "Something went wrong while registering user");
+  }
+
+  return res.status(201).json(
+    new ApiResponse(201, {
+      message: "User registered successfully and verification email sent",
+      data: createdUser,
+    }),
+  );
+});
+```
+
+## 20. Custom Validation
+
+```
+email = "one@one.com"
+email = "oneone.com"
+email = "one@onecom"
+```
+
+> Here only `one@one.com` is valid email
+
+### Tools for validation
+
+1. zod
+2. yup
+3. joi
+4. express-validator
+
+### Middleware
+
+Middleware is a function that has access to `req` and `res` objects.
+It is used to modify the request and response objects before they reach the route handler.
+
+### Express Validator
+
+```sh
+npm i express-validator
+```
