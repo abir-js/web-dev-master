@@ -16,7 +16,7 @@ const generateAccessAndRefreshToken = async (userId) => {
   } catch (error) {
     throw new ApiError(
       500,
-      "Something went wrong while generating access and refresh token"
+      "Something went wrong while generating access and refresh token",
     );
   }
 };
@@ -52,13 +52,13 @@ const registerUser = asyncHandler(async (req, res) => {
     subject: "Email Verification",
     mailgenContent: emailVerificationMailgenContent(
       user.username,
-      `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`
+      `${req.protocol}://${req.get("host")}/api/v1/users/verify-email/${unHashedToken}`,
     ),
   });
 
   // ✅ Fetch user without sensitive fields
   const createdUser = await User.findById(user._id).select(
-    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry"
+    "-password -refreshToken -emailVerificationToken -emailVerificationExpiry",
   );
 
   if (!createdUser) {
@@ -69,7 +69,7 @@ const registerUser = asyncHandler(async (req, res) => {
     new ApiResponse(201, {
       message: "User registered successfully and verification email sent",
       data: createdUser,
-    })
+    }),
   );
 });
 
