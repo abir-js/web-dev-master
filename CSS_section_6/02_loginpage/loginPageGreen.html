@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #1a1a1a;
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .container {
+            background-color: #605f5f;
+            /* height: 200px; */
+            width: 400px;
+            border-radius: 5px;
+            /* padding: 30px; */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 15px;
+            
+        }
+        
+        form {
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .email, .email input{
+            width: 100%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        .name {
+            width: 100%
+        }
+
+        .name input{
+            width: 45%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+            margin-left: 10px;
+        }
+
+        .password {
+            width: 100%;
+            text-align: center;
+        }
+
+        .password input{
+            width: 70%;
+            padding: 10px;
+            border-radius: 5px;
+            border: none;
+        }
+
+        button{
+            padding: 10px 15px;
+            margin-bottom: 10px;
+            border: none;
+            border-radius: 5px;
+            background-color: #0bf044;
+        }
+
+        button:hover{
+            background-color: #05b431;
+        }
+
+        button:active{
+            background-color: #0bf044;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="container">
+        <form action="">
+            <div class="email">
+                <input type="email" name="" id="" placeholder="email">
+            </div>
+            <div class="name">
+                <input type="text" placeholder="First name">
+                <input type="text" placeholder="Last name">
+            </div>
+            <div class="password">
+                <input type="password" name="" id="" placeholder="Password">
+            </div>
+            <div class="button">
+                <button>Signup</button>
+            </div>
+        </form>
+    </div>
+</body>
+</html>
